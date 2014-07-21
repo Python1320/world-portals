@@ -28,9 +28,30 @@ hook.Add( "PostRender", "WorldPortals_StartRender", function()
 	hook.Remove( "PostRender", "WorldPortals_StartRender" )
 end )
 
+local function ShouldRender( portal, exitPortal, plyOrigin )
+
+	local distance = plyOrigin:Distance( portal:GetPos() )
+	local disappearDist = portal:GetDisappearDist()
+
+	if not (disappearDist <= 0) and distance > disappearDist then return false end
+
+	if not IsValid( exitPortal ) then return false end
+
+	if not portal:GetShouldDrawNextFrame() then return false end
+
+	--don't render if the player is behind the portal
+	local vec = plyOrigin - portal:GetPos()
+	if ( portal:GetForward():Dot( vec ) < 0 ) then return false end
+
+	portal:SetShouldDrawNextFrame( false )
+
+	return true
+end
+
+
 
 -- Render views from the portals
-hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngles)
+hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngles )
 
 	portals = ents.FindByClass( "linked_portal_door" )
 
@@ -43,14 +64,9 @@ hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngles)
 	
 	for _, portal in pairs( portals ) do
 
-		local distance = plyOrigin:Distance( portal:GetPos() ) /8 --divide to match distance in hammer
-
 		local exitPortal = portal:GetExit()
 
-		if not (portal:GetDisappearDist() < 0) and distance > portal:GetDisappearDist() then continue end
-
-		if not IsValid( exitPortal ) then continue end
-
+		if not ShouldRender( portal, exitPortal, plyOrigin ) then continue end
 
 		local oldRT = render.GetRenderTarget()
 		render.SetRenderTarget( portal:GetTexture() )
@@ -59,7 +75,7 @@ hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngles)
 			render.ClearStencil()
 
 			render.EnableClipping(true)
-			render.PushCustomClipPlane( exitPortal:GetForward(), exitPortal:GetForward():Dot(exitPortal:GetPos() ) )
+			render.PushCustomClipPlane( exitPortal:GetForward(), exitPortal:GetForward():Dot(exitPortal:GetPos() - (exitPortal:GetForward() *0.5) ) )
 
 			local localOrigin = portal:WorldToLocal( plyOrigin )
 			local localAngles = portal:WorldToLocalAngles( plyAngles )
