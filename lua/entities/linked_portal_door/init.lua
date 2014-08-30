@@ -61,7 +61,7 @@ function ENT:Touch( ent )
 				ent:SetAngles( new_angle )
 
 				local phys = ent:GetPhysicsObject()
-				if phys then phys:SetVelocity( new_velocity ) end
+				if IsValid(phys) then phys:SetVelocity( new_velocity ) end
 			end
 			
 			ent:ForcePlayerDrop()
