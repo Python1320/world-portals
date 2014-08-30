@@ -54,7 +54,7 @@ function ENT:Touch( ent )
 
 			ent:SetPos( new_pos )
 			if ent:IsPlayer() then
-				ent:SetEyeAngles( new_angle )
+				ent:SetEyeAngles( Angle(new_angle.p, new_angle.y, 0) ) -- fixes view being rotated, needs cool transition from new_angle.r to 0 like in portal
 				ent:SetVelocity( new_velocity -old_velocity )
 				wp.AlertPlayerOnTeleport( ent )
 			else
