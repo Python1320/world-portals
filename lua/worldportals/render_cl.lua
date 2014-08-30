@@ -1,6 +1,6 @@
 
---Setup variables
-worldportals.matView = CreateMaterial(
+-- Setup variables
+wp.matView = CreateMaterial(
 	"UnlitGeneric",
 	"GMODScreenspace",
 	{
@@ -9,22 +9,15 @@ worldportals.matView = CreateMaterial(
 		["$vertexalpha"] = "1",
 	}
 )
-worldportals.matDummy = Material( "debug/white" )
+wp.matDummy = Material( "debug/white" )
 
+wp.portals = {}
+wp.drawing = true --default portals to not draw
 
---POTENTIAL IMPROVEMENT
---add portals when they're created
---remove portals when they're destroyed
---this would be slightly better than just finding all of them every frame
---hook.Add( "OnEntityCreated", "WorldPortalRenderHook", function( ent )
-
-local portals
-worldportals.drawing = true --default portals to not draw
-
---Start drawing the portals
---This prevents the game from crashing when loaded for the first time
+-- Start drawing the portals
+-- This prevents the game from crashing when loaded for the first time
 hook.Add( "PostRender", "WorldPortals_StartRender", function()
-	worldportals.drawing = false
+	wp.drawing = false
 	hook.Remove( "PostRender", "WorldPortals_StartRender" )
 end )
 
@@ -40,8 +33,10 @@ local function ShouldRender( portal, exitPortal, plyOrigin )
 	if not portal:GetShouldDrawNextFrame() then return false end
 
 	--don't render if the player is behind the portal
-	local vec = plyOrigin - portal:GetPos()
-	if ( portal:GetForward():Dot( vec ) < 0 ) then return false end
+	local behind = wp.IsBehind( plyOrigin, portal:GetPos(), portal:GetForward() )
+	if behind then return false end
+	
+	if hook.Call("wp-shouldrender", GAMEMODE, portal, exitPortal, plyOrigin)==false then return false end
 
 	portal:SetShouldDrawNextFrame( false )
 
@@ -51,18 +46,18 @@ end
 
 
 -- Render views from the portals
-hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngles )
+hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
 
-	portals = ents.FindByClass( "linked_portal_door" )
+	wp.portals = ents.FindByClass( "linked_portal_door" )
 
-	if ( not portals ) then return end
-	if ( worldportals.drawing ) then return end
+	if ( not wp.portals ) then return end
+	if ( wp.drawing ) then return end
 
-	--Disable phys gun glow and beam
+	-- Disable phys gun glow and beam
 	local oldWepColor = LocalPlayer():GetWeaponColor()
 	LocalPlayer():SetWeaponColor( Vector(0, 0, 0) )
 	
-	for _, portal in pairs( portals ) do
+	for _, portal in pairs( wp.portals ) do
 
 		local exitPortal = portal:GetExit()
 
@@ -77,29 +72,24 @@ hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngles )
 			render.EnableClipping(true)
 			render.PushCustomClipPlane( exitPortal:GetForward(), exitPortal:GetForward():Dot(exitPortal:GetPos() - (exitPortal:GetForward() *0.5) ) )
 
-			local localOrigin = portal:WorldToLocal( plyOrigin )
-			local localAngles = portal:WorldToLocalAngles( plyAngles )
+			local camOrigin = wp.TransformPortalPos( plyOrigin, portal, exitPortal )
+			local camAngle = wp.TransformPortalAngle( plyAngle, portal, exitPortal )
 
-			localOrigin:Rotate( Angle(0, 180, 0) )
-			localAngles:RotateAroundAxis( Vector(0, 0, 1), 180)
-
-			local camOrigin = exitPortal:LocalToWorld( localOrigin )
-			local camAngles = exitPortal:LocalToWorldAngles( localAngles )
-
-			worldportals.drawing = true
+			wp.drawing = true
 				render.RenderView( {
 					x = 0,
 					y = 0,
 					w = ScrW(),
 					h = ScrH(),
 					origin = camOrigin,
-					angles = camAngles,
+					angles = camAngle,
 					drawpostprocess = true,
 					drawhud = false,
 					drawmonitors = false,
 					drawviewmodel = false,
+					--zfar = 1500
 				} )
-			worldportals.drawing = false
+			wp.drawing = false
 
 			render.PopCustomClipPlane()
 			render.EnableClipping(false)
@@ -108,16 +98,3 @@ hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngles )
 
 	LocalPlayer():SetWeaponColor( oldWepColor )
 end )
-
--- Set it to draw the player while rendering portals
--- Calling Start3D to fix this is incredibly hacky
-hook.Add( "PostDrawEffects", "WorldPortals_PlayerDrawFix", function()
-	cam.Start3D( EyePos(), EyeAngles() )
-	cam.End3D()
-end)
-
-hook.Add( "ShouldDrawLocalPlayer", "WorldPortals_PlayerDraw", function()
-	if worldportals.drawing then
-		return true
-	end
-end)

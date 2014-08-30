@@ -5,12 +5,10 @@ ENT.AdminOnly			= false
 ENT.Editable			= false
 
 
---ENT.Model = Model("models/props/cs_office/microwave.mdl")
-
 function ENT:Initialize()
 
-	local mins = Vector(-1, -self:GetWidth() /2, -self:GetHeight() /2)
-	local maxs = -mins
+	local mins = Vector( 0, -self:GetWidth() /2, -self:GetHeight() /2 )
+	local maxs = Vector( 10, self:GetWidth() /2, self:GetHeight() /2)
 
 	if CLIENT then
 
@@ -24,25 +22,16 @@ function ENT:Initialize()
 
 	else
 
-		self:SetTrigger(true)
+		self:SetTrigger( true )
 
 	end
 
-	--self:SetModel(self.Model)
+	self:SetMoveType( MOVETYPE_NONE )
+	self:SetSolid( SOLID_OBB )
+	self:SetNotSolid( true )
+	self:SetCollisionBounds( mins, maxs )
 
-	--self:PhysicsInit(SOLID_VPHYSICS)
-	--self:SetMoveType(MOVETYPE_VPHYSICS)
-	self:SetMoveType(MOVETYPE_NONE)
-	self:SetSolid(SOLID_OBB)
-	self:SetNotSolid(true)
-	self:SetCollisionBounds(mins, maxs)
-
-	self:EnableCustomCollisions(true)
 	self:DrawShadow( false )
-
-	--local phys = self:GetPhysicsObject()
-	--phys:EnableMotion( true )
-	--phys:Wake()
 
 end
 

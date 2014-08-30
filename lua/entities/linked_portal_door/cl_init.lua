@@ -5,15 +5,11 @@ AccessorFunc( ENT, "texture", "Texture" )
 AccessorFunc( ENT, "shouldDrawaNextFrame", "ShouldDrawNextFrame" )
 
 
---Draw world portals
---overridedepthenable for drawing quad?
+-- Draw world portals
 function ENT:Draw()
 
-	--self:DrawModel()
+	if wp.drawing then return end
 
-	if worldportals.drawing then return end
-
-	--portal is rendering, so start rendering the view from it next frame
 	self:SetShouldDrawNextFrame( true )
 
 	render.ClearStencil()
@@ -28,17 +24,17 @@ function ENT:Draw()
 	render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_ALWAYS )
 	render.SetStencilReferenceValue( 1 )
 	
-	render.SetMaterial( worldportals.matDummy )
+	render.SetMaterial( wp.matDummy )
 	render.SetColorModulation( 1, 1, 1 )
 
-	render.DrawQuadEasy( self:GetPos(), self:GetForward(), self:GetWidth(), self:GetHeight(), Color( 255, 255, 255, 255), self:GetAngles().roll )
+	render.DrawQuadEasy( self:GetPos() -( self:GetForward() *5), self:GetForward(), self:GetWidth(), self:GetHeight(), Color( 255, 255, 255, 255), self:GetAngles().roll )
 	
 	render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
 	render.SetStencilPassOperation( STENCILOPERATION_REPLACE )
 	render.SetStencilReferenceValue( 1 )
 	
-	worldportals.matView:SetTexture( "$basetexture", self:GetTexture() )
-	render.SetMaterial( worldportals.matView )
+	wp.matView:SetTexture( "$basetexture", self:GetTexture() )
+	render.SetMaterial( wp.matView )
 	render.DrawScreenQuad()
 	
 	render.SetStencilEnable( false )

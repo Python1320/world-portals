@@ -32,3 +32,43 @@ function ENT:KeyValue( key, value )
 		self:SetAngles( Angle( unpack(args) ) )
 	end
 end
+
+-- Teleportation
+function ENT:Touch( ent )
+
+	local vel_norm = ent:GetVelocity():GetNormalized()
+
+	-- Object is moving towards the portal
+	if vel_norm:Dot( self:GetForward() ) < 0 then
+
+		local projected_distance = wp.DistanceToPlane( ent:EyePos() + ent:GetVelocity() * engine.TickInterval(), self:GetPos(), self:GetForward() )
+
+		if projected_distance < 0 and hook.Call("wp-shouldtp",GAMEMODE,self,ent)~=false then
+
+			local new_pos = wp.TransformPortalPos( ent:GetPos() + ent:GetVelocity() * engine.TickInterval(), self, self:GetExit() )
+			local old_velocity = ent:GetVelocity()
+			local new_velocity = old_velocity + Vector(0,0,0) --stupid pointers
+			local new_angle = wp.TransformPortalAngle( ent:GetAngles(), self, self:GetExit() )
+
+			new_velocity = wp.TransformPortalVector( new_velocity, self, self:GetExit() )
+
+			ent:SetPos( new_pos )
+			if ent:IsPlayer() then
+				ent:SetEyeAngles( new_angle )
+				ent:SetVelocity( new_velocity -old_velocity )
+				wp.AlertPlayerOnTeleport( ent )
+			else
+				ent:SetAngles( new_angle )
+
+				local phys = ent:GetPhysicsObject()
+				if phys then phys:SetVelocity( new_velocity ) end
+			end
+			
+			ent:ForcePlayerDrop()
+			
+			if self.TPHook then
+				self:TPHook(ent)
+			end
+		end
+	end
+end
