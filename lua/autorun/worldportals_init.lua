@@ -17,6 +17,6 @@ if SERVER then
 else
 
 	include( "worldportals/render_cl.lua" )
-	include( "worldportals/teleport_cl.lua" )
+	--include( "worldportals/teleport_cl.lua" )
 
 end
