@@ -69,3 +69,27 @@ net.Receive( "WorldPortals_TeleportAlert", function()
 	hook.Remove( "CalcView", "WorldPortals_PredictTeleView" )
 end )
 ]]--
+
+hook.Add("CalcView", "WorldPortals_RotateView", function(ply,pos,ang,fov)
+	if wp.rotating then
+		local offset=0.5 -- End transition smoothness (lower is smoother)
+		if math.abs(wp.rotating) > offset then
+			wp.rotating = math.Approach(wp.rotating,0,FrameTime()*math.abs(wp.rotating-offset)*3.5)
+			local view={
+				origin=pos,
+				angles=Angle(ang.p,ang.y,wp.rotating+offset),
+				fov=fov
+			}
+			return view
+		else
+			wp.rotating=nil
+		end
+	end
+end)
+
+net.Receive("WorldPortals_TeleportAlert", function()
+	local roll=net.ReadFloat()
+	if roll ~= 0 then
+		wp.rotating=roll
+	end
+end)

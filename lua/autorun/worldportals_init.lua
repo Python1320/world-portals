@@ -12,11 +12,11 @@ if SERVER then
 
 	AddCSLuaFile( "worldportals/utils_sh.lua" )
 	AddCSLuaFile( "worldportals/render_cl.lua" )
-	--AddCSLuaFile( "worldportals/teleport_cl.lua" )
+	AddCSLuaFile( "worldportals/teleport_cl.lua" )
 
 else
 
 	include( "worldportals/render_cl.lua" )
-	--include( "worldportals/teleport_cl.lua" )
+	include( "worldportals/teleport_cl.lua" )
 
 end
