@@ -76,6 +76,7 @@ hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
 			local camAngle = wp.TransformPortalAngle( plyAngle, portal, exitPortal )
 
 			wp.drawing = true
+			wp.drawingent = portal
 				render.RenderView( {
 					x = 0,
 					y = 0,
@@ -90,6 +91,7 @@ hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
 					--zfar = 1500
 				} )
 			wp.drawing = false
+			wp.drawingent = nil
 
 			render.PopCustomClipPlane()
 			render.EnableClipping(false)
