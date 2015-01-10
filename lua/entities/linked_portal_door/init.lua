@@ -46,22 +46,19 @@ function ENT:Touch( ent )
 		if projected_distance < 0 and hook.Call("wp-shouldtp",GAMEMODE,self,ent)~=false then
 
 			local new_pos = wp.TransformPortalPos( ent:GetPos() + ent:GetVelocity() * engine.TickInterval(), self, self:GetExit() )
-			local old_velocity = ent:GetVelocity()
-			local new_velocity = old_velocity + Vector(0,0,0) --stupid pointers
+			local new_velocity = wp.TransformPortalVector( ent:GetVelocity(), self, self:GetExit() )
 			local new_angle = wp.TransformPortalAngle( ent:GetAngles(), self, self:GetExit() )
-
-			new_velocity = wp.TransformPortalVector( new_velocity, self, self:GetExit() )
 
 			ent:SetPos( new_pos )
 			if ent:IsPlayer() then
 				ent:SetEyeAngles( Angle(new_angle.p, new_angle.y, 0) )
-				ent:SetVelocity( new_velocity -old_velocity )
+				ent:SetLocalVelocity( new_velocity )
 				wp.AlertPlayerOnTeleport( ent, new_angle.r )
 			else
 				ent:SetAngles( new_angle )
 
 				local phys = ent:GetPhysicsObject()
-				if IsValid(phys) then phys:SetVelocity( new_velocity ) end
+				if IsValid(phys) then phys:SetVelocityInstantaneous( new_velocity ) end
 			end
 			
 			ent:ForcePlayerDrop()
