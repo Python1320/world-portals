@@ -21,24 +21,21 @@ hook.Add( "PostRender", "WorldPortals_StartRender", function()
 	hook.Remove( "PostRender", "WorldPortals_StartRender" )
 end )
 
-local function ShouldRender( portal, exitPortal, plyOrigin )
-
-	local distance = plyOrigin:Distance( portal:GetPos() )
+function wp.shouldrender( portal )
+	local camOrigin = GetViewEntity():GetPos()
+	local exitPortal = portal:GetExit()
+	local distance = camOrigin:Distance( portal:GetPos() )
 	local disappearDist = portal:GetDisappearDist()
 
 	if not (disappearDist <= 0) and distance > disappearDist then return false end
 
 	if not IsValid( exitPortal ) then return false end
 
-	if not portal:GetShouldDrawNextFrame() then return false end
-
-	--don't render if the player is behind the portal
-	local behind = wp.IsBehind( plyOrigin, portal:GetPos(), portal:GetForward() )
+	--don't render if the view is behind the portal
+	local behind = wp.IsBehind( camOrigin, portal:GetPos(), portal:GetForward() )
 	if behind then return false end
 	
 	if hook.Call("wp-shouldrender", GAMEMODE, portal, exitPortal, plyOrigin)==false then return false end
-
-	portal:SetShouldDrawNextFrame( false )
 
 	return true
 end
@@ -61,8 +58,10 @@ hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
 
 		local exitPortal = portal:GetExit()
 
-		if not ShouldRender( portal, exitPortal, plyOrigin ) then continue end
-
+		if not wp.shouldrender( portal, exitPortal, plyOrigin ) then continue end
+		if not portal:GetShouldDrawNextFrame() then continue end
+		portal:SetShouldDrawNextFrame( false )
+		
 		local oldRT = render.GetRenderTarget()
 		render.SetRenderTarget( portal:GetTexture() )
 			render.Clear( 0, 0, 0, 255 )
@@ -100,3 +99,9 @@ hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
 
 	LocalPlayer():SetWeaponColor( oldWepColor )
 end )
+
+hook.Add("ShouldDrawLocalPlayer", "WorldPortals_Render", function()
+	if wp.drawing then
+		return true
+	end
+end)

@@ -4,6 +4,7 @@ wp = {}
 
 -- Load required files
 include( "worldportals/utils_sh.lua" )
+include( "worldportals/teleport_sh.lua" )
 
 if SERVER then
 
@@ -13,6 +14,7 @@ if SERVER then
 	AddCSLuaFile( "worldportals/utils_sh.lua" )
 	AddCSLuaFile( "worldportals/render_cl.lua" )
 	AddCSLuaFile( "worldportals/teleport_cl.lua" )
+	AddCSLuaFile( "worldportals/teleport_sh.lua" )
 
 else
 

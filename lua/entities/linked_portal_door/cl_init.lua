@@ -9,6 +9,7 @@ AccessorFunc( ENT, "shouldDrawaNextFrame", "ShouldDrawNextFrame" )
 function ENT:Draw()
 
 	if wp.drawing then return end
+	if not wp.shouldrender(self) then return end
 
 	self:SetShouldDrawNextFrame( true )
 

@@ -30,6 +30,7 @@ function ENT:Initialize()
 	self:SetSolid( SOLID_OBB )
 	self:SetNotSolid( true )
 	self:SetCollisionBounds( mins, maxs )
+	self:SetCollisionGroup( COLLISION_GROUP_WORLD )
 
 	self:DrawShadow( false )
 
