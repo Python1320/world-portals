@@ -100,8 +100,10 @@ hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
 	LocalPlayer():SetWeaponColor( oldWepColor )
 end )
 
+--[[ causes player to see themselves in first person sometimes (particularly in multiplayer)
 hook.Add("ShouldDrawLocalPlayer", "WorldPortals_Render", function()
 	if wp.drawing then
 		return true
 	end
 end)
+]]--
