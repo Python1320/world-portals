@@ -26,16 +26,19 @@ function wp.shouldrender( portal )
 	local exitPortal = portal:GetExit()
 	local distance = camOrigin:Distance( portal:GetPos() )
 	local disappearDist = portal:GetDisappearDist()
-
-	if not (disappearDist <= 0) and distance > disappearDist then return false end
-
+	
+	local override=hook.Call("wp-shouldrender", GAMEMODE, portal, exitPortal, plyOrigin)
+	if override ~= nil then return override end
+	
 	if not IsValid( exitPortal ) then return false end
-
+	
+	if not (disappearDist <= 0) and distance > disappearDist then return false end
+	
 	--don't render if the view is behind the portal
 	local behind = wp.IsBehind( camOrigin, portal:GetPos(), portal:GetForward() )
 	if behind then return false end
 	
-	if hook.Call("wp-shouldrender", GAMEMODE, portal, exitPortal, plyOrigin)==false then return false end
+	
 
 	return true
 end
@@ -61,6 +64,8 @@ hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
 		if not wp.shouldrender( portal, exitPortal, plyOrigin ) then continue end
 		if not portal:GetShouldDrawNextFrame() then continue end
 		portal:SetShouldDrawNextFrame( false )
+		
+		hook.Call("wp-prerender", GAMEMODE, portal, exitPortal, plyOrigin)
 		
 		local oldRT = render.GetRenderTarget()
 		render.SetRenderTarget( portal:GetTexture() )
@@ -95,6 +100,8 @@ hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
 			render.PopCustomClipPlane()
 			render.EnableClipping(false)
 		render.SetRenderTarget( oldRT )
+		
+		hook.Call("wp-postrender", GAMEMODE, portal, exitPortal, plyOrigin)
 	end
 
 	LocalPlayer():SetWeaponColor( oldWepColor )
