@@ -75,6 +75,7 @@ function ENT:Touch( ent )
 			else
 				ent:SetAngles( new_angle )
 
+				ent:SetVelocity( new_velocity )
 				local phys = ent:GetPhysicsObject()
 				if IsValid(phys) then phys:SetVelocityInstantaneous( new_velocity ) end
 			end
