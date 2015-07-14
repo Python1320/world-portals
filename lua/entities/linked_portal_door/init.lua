@@ -36,10 +36,12 @@ end
 -- Teleportation
 function ENT:Touch( ent )
 	
-	local ents = constraing.GetAllConstrainedEntities() // don't mess up this contraption we're on
-	for k,v in pairs( ents ) do
-		if v == ent then
-			return
+	if IsValid( self:GetParent() ) then
+		local ents = constraint.GetAllConstrainedEntities( self:GetParent() ) // don't mess up this contraption we're on
+		for k,v in pairs( ents ) do
+			if v == ent then
+				return
+			end
 		end
 	end
 	local vel_norm = ent:GetVelocity():GetNormalized()
