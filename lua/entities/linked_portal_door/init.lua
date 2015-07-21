@@ -35,6 +35,15 @@ end
 
 -- Teleportation
 function ENT:Touch( ent )
+	
+	if IsValid( self:GetParent() ) then
+		local ents = constraint.GetAllConstrainedEntities( self:GetParent() ) // don't mess up this contraption we're on
+		for k,v in pairs( ents ) do
+			if v == ent then
+				return
+			end
+		end
+	end
 	local vel_norm = ent:GetVelocity():GetNormalized()
 
 	-- Object is moving towards the portal
@@ -66,6 +75,7 @@ function ENT:Touch( ent )
 			else
 				ent:SetAngles( new_angle )
 
+				ent:SetVelocity( new_velocity )
 				local phys = ent:GetPhysicsObject()
 				if IsValid(phys) then phys:SetVelocityInstantaneous( new_velocity ) end
 			end
