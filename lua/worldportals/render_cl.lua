@@ -9,7 +9,7 @@ wp.matView = CreateMaterial(
 		["$vertexalpha"] = "1",
 	}
 )
-wp.matDummy = Material( "debug/white" )
+wp.matDummy = Material( "wp/black" )
 
 wp.portals = {}
 wp.drawing = true --default portals to not draw
@@ -27,8 +27,8 @@ function wp.shouldrender( portal )
 	local distance = camOrigin:Distance( portal:GetPos() )
 	local disappearDist = portal:GetDisappearDist()
 	
-	local override=hook.Call("wp-shouldrender", GAMEMODE, portal, exitPortal, plyOrigin)
-	if override ~= nil then return override end
+	local override,drawblack=hook.Call("wp-shouldrender", GAMEMODE, portal, exitPortal, plyOrigin)
+	if override ~= nil then return override,drawblack end
 	
 	if not IsValid( exitPortal ) then return false end
 	
@@ -61,7 +61,7 @@ hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
 
 		local exitPortal = portal:GetExit()
 
-		if not wp.shouldrender( portal, exitPortal, plyOrigin ) then continue end
+		if not wp.shouldrender( portal ) then continue end
 		if not portal:GetShouldDrawNextFrame() then continue end
 		portal:SetShouldDrawNextFrame( false )
 		
