@@ -11,6 +11,9 @@ function ENT:Draw()
 	if wp.drawing then return end
 	local shouldrender,drawblack=wp.shouldrender(self)
 	if not (shouldrender or drawblack) then return end
+	
+	local exitPortal = self:GetExit()
+	hook.Call("wp-predraw", GAMEMODE, self, exitPortal)
 
 	if shouldrender then
 		self:SetShouldDrawNextFrame( true )
@@ -43,4 +46,5 @@ function ENT:Draw()
 		render.SetStencilEnable( false )
 	end
 	
+	hook.Call("wp-postdraw", GAMEMODE, self, exitPortal)
 end

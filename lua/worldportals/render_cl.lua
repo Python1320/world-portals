@@ -27,7 +27,7 @@ function wp.shouldrender( portal )
 	local distance = camOrigin:Distance( portal:GetPos() )
 	local disappearDist = portal:GetDisappearDist()
 	
-	local override,drawblack=hook.Call("wp-shouldrender", GAMEMODE, portal, exitPortal, plyOrigin)
+	local override,drawblack=hook.Call("wp-shouldrender", GAMEMODE, portal, exitPortal)
 	if override ~= nil then return override,drawblack end
 	
 	if not IsValid( exitPortal ) then return false end
@@ -38,8 +38,6 @@ function wp.shouldrender( portal )
 	local behind = wp.IsBehind( camOrigin, portal:GetPos(), portal:GetForward() )
 	if behind then return false end
 	
-	
-
 	return true
 end
 
