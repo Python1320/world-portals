@@ -63,13 +63,10 @@ hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
 		if not portal:GetShouldDrawNextFrame() then continue end
 		portal:SetShouldDrawNextFrame( false )
 		
-		hook.Call("wp-prerender", GAMEMODE, portal, exitPortal, plyOrigin)
+		hook.Call( "wp-prerender", GAMEMODE, portal, exitPortal, plyOrigin )
 		
-		local oldRT = render.GetRenderTarget()
-		render.SetRenderTarget( portal:GetTexture() )
-			render.Clear( 0, 0, 0, 255 )
-			render.ClearDepth()
-			render.ClearStencil()
+		render.PushRenderTarget( portal:GetTexture() )
+			render.Clear( 0, 0, 0, 255, true, true )
 
 			render.EnableClipping(true)
 			render.PushCustomClipPlane( exitPortal:GetForward(), exitPortal:GetForward():Dot(exitPortal:GetPos() - (exitPortal:GetForward() *0.5) ) )
@@ -97,7 +94,7 @@ hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
 
 			render.PopCustomClipPlane()
 			render.EnableClipping(false)
-		render.SetRenderTarget( oldRT )
+		render.PopRenderTarget()
 		
 		hook.Call("wp-postrender", GAMEMODE, portal, exitPortal, plyOrigin)
 	end
