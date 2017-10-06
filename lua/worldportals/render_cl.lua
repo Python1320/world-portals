@@ -83,10 +83,11 @@ hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
 					h = ScrH(),
 					origin = camOrigin,
 					angles = camAngle,
-					dopostprocess = true,
+					dopostprocess = false,
 					drawhud = false,
 					drawmonitors = false,
-					drawviewmodel = false
+					drawviewmodel = false,
+					bloomtone = true
 					--zfar = 1500
 				} )
 			wp.drawing = false
