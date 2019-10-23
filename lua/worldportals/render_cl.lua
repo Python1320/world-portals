@@ -27,10 +27,11 @@ function wp.shouldrender( portal )
 	local distance = camOrigin:Distance( portal:GetPos() )
 	local disappearDist = portal:GetDisappearDist()
 	
+	if not IsValid( exitPortal ) then return false end
+	
 	local override, drawblack = hook.Call( "wp-shouldrender", GAMEMODE, portal, exitPortal )
 	if override ~= nil then return override, drawblack end
 	
-	if not IsValid( exitPortal ) then return false end
 	
 	if not (disappearDist <= 0) and distance > disappearDist then return false end
 	
@@ -58,6 +59,7 @@ hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
 	for _, portal in pairs( wp.portals ) do
 
 		local exitPortal = portal:GetExit()
+		if not IsValid(exitPortal) then continue end
 
 		if not wp.shouldrender( portal ) then continue end
 		if not portal:GetShouldDrawNextFrame() then continue end

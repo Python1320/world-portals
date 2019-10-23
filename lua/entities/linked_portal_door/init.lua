@@ -35,6 +35,7 @@ end
 
 -- Teleportation
 function ENT:Touch( ent )
+	if not IsValid(self:GetExit()) then return end
 	
 	if IsValid( self:GetParent() ) then
 		local ents = constraint.GetAllConstrainedEntities( self:GetParent() ) // don't mess up this contraption we're on
