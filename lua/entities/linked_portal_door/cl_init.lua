@@ -13,6 +13,7 @@ function ENT:Draw()
 	if not (shouldrender or drawblack) then return end
 
 	local exitPortal = self:GetExit()
+	if not IsValid(exitPortal) then return end
 	hook.Call("wp-predraw", GAMEMODE, self, exitPortal)
 
 	if shouldrender then

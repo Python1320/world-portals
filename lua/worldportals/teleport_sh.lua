@@ -1,6 +1,7 @@
 
 hook.Add("EntityFireBullets", "WorldPortals_Bullets", function(ent,data)
 	for k,v in pairs(ents.FindByClass("linked_portal_door")) do
+		if not IsValid(v:GetExit()) then continue end
 		local hit,norm,fraction=util.IntersectRayWithOBB(data.Src, data.Dir*16000, v:GetPos(), v:GetAngles(), v:GetCollisionBounds())
 		if hit then
 			v:SetNotSolid(false)
