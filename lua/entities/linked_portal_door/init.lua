@@ -97,3 +97,10 @@ function ENT:Touch( ent )
 		end
 	end
 end
+
+function ENT:AcceptInput( inputName, activator, caller, data )
+	if ( inputName == "SetPartner" ) then
+		self:SetPartnerName( data )
+		self:SetExit( ents.FindByName( data )[1] )
+	end
+end
