@@ -43,7 +43,7 @@ end
 -- Teleportation
 function ENT:Touch( ent )
 	if self:GetEnableTeleport() == false then return end
-	var exit = self:GetExit()
+	local exit = self:GetExit()
 	if not IsValid(exit) then return end
 	
 	if IsValid( self:GetParent() ) then
