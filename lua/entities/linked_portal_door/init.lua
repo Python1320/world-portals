@@ -5,6 +5,7 @@ AddCSLuaFile( "shared.lua" )
 include( "shared.lua" )
 
 AccessorFunc( ENT, "partnername", "PartnerName" )
+AccessorFunc( ENT, "enableteleport", "EnableTeleport", FORCE_BOOL )
 
 -- Collect properties
 function ENT:KeyValue( key, value )
@@ -30,11 +31,15 @@ function ENT:KeyValue( key, value )
 		end
 
 		self:SetAngles( Angle( unpack(args) ) )
+
+	elseif ( key == "EnableTeleport" ) then
+		self:SetEnableTeleport( tobool(value) )
 	end
 end
 
 -- Teleportation
 function ENT:Touch( ent )
+	if self:GetEnableTeleport() == false then return end
 	if not IsValid(self:GetExit()) then return end
 	
 	if IsValid( self:GetParent() ) then
@@ -102,5 +107,8 @@ function ENT:AcceptInput( inputName, activator, caller, data )
 	if ( inputName == "SetPartner" ) then
 		self:SetPartnerName( data )
 		self:SetExit( ents.FindByName( data )[1] )
+
+	elseif ( key == "EnableTeleport" ) then
+		self:SetEnableTeleport( tobool(data) )
 	end
 end
