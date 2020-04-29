@@ -34,13 +34,17 @@ function ENT:KeyValue( key, value )
 
 	elseif ( key == "EnableTeleport" ) then
 		self:SetEnableTeleport( tobool(value) )
+
+	elseif ( string.Left( key, 2 ) == "On" ) then
+		self:StoreOutput( key, value )
 	end
 end
 
 -- Teleportation
 function ENT:Touch( ent )
 	if self:GetEnableTeleport() == false then return end
-	if not IsValid(self:GetExit()) then return end
+	var exit = self:GetExit()
+	if not IsValid(exit) then return end
 	
 	if IsValid( self:GetParent() ) then
 		local ents = constraint.GetAllConstrainedEntities( self:GetParent() ) // don't mess up this contraption we're on
@@ -59,9 +63,9 @@ function ENT:Touch( ent )
 
 		if projected_distance < 0 and hook.Call("wp-shouldtp",GAMEMODE,self,ent)~=false then
 
-			local new_pos = wp.TransformPortalPos( ent:GetPos() + ent:GetVelocity() * engine.TickInterval(), self, self:GetExit() )
-			local new_velocity = wp.TransformPortalVector( ent:GetVelocity(), self, self:GetExit() )
-			local new_angle = wp.TransformPortalAngle( ent:GetAngles(), self, self:GetExit() )
+			local new_pos = wp.TransformPortalPos( ent:GetPos() + ent:GetVelocity() * engine.TickInterval(), self, exit )
+			local new_velocity = wp.TransformPortalVector( ent:GetVelocity(), self, exit )
+			local new_angle = wp.TransformPortalAngle( ent:GetAngles(), self, exit )
 			
 			local store
 			if ent:IsRagdoll() then
@@ -78,12 +82,16 @@ function ENT:Touch( ent )
 				ent:SetEyeAngles( Angle(new_angle.p, new_angle.y, 0) )
 				ent:SetLocalVelocity( new_velocity )
 				wp.AlertPlayerOnTeleport( ent, new_angle.r )
+				self:TriggerOutput("OnPlayerTeleportFromMe", ent)
+				exit:TriggerOutput("OnPlayerTeleportToMe", ent)
 			else
 				ent:SetAngles( new_angle )
 
 				ent:SetVelocity( new_velocity )
 				local phys = ent:GetPhysicsObject()
 				if IsValid(phys) then phys:SetVelocityInstantaneous( new_velocity ) end
+				self:TriggerOutput("OnEntityTeleportFromMe", ent)
+				exit:TriggerOutput("OnEntityTeleportToMe", ent)
 			end
 			if ent:IsRagdoll() then
 				for i=0,ent:GetPhysicsObjectCount() do
@@ -108,7 +116,7 @@ function ENT:AcceptInput( inputName, activator, caller, data )
 		self:SetPartnerName( data )
 		self:SetExit( ents.FindByName( data )[1] )
 
-	elseif ( key == "EnableTeleport" ) then
+	elseif ( inputName == "EnableTeleport" ) then
 		self:SetEnableTeleport( tobool(data) )
 	end
 end
