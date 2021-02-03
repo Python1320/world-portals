@@ -1,7 +1,7 @@
 
 hook.Add("EntityFireBullets", "WorldPortals_Bullets", function(ent,data)
 	local portal = wp.GetFirstPortalHit(data.Src, data.Dir)
-	if(IsValid(portal.Entity)) then
+	if IsValid(portal.Entity) then
 		local localHitPos = portal.Entity:WorldToLocal(portal.HitPos)
 		local mins, maxs = portal.Entity:GetCollisionBounds()
 		if localHitPos.y > mins.y and localHitPos.y < maxs.y
@@ -10,7 +10,7 @@ hook.Add("EntityFireBullets", "WorldPortals_Bullets", function(ent,data)
 			data.Src=wp.TransformPortalPos( portal.HitPos, portal.Entity, portal.Entity:GetExit() )
 			data.Dir=wp.TransformPortalAngle( data.Dir:Angle(), portal.Entity, portal.Entity:GetExit() ):Forward()
 
-			local filter =  hook.Call("wp-tracefilter", GAMEMODE, portal.Entity)
+			local filter = hook.Call("wp-tracefilter", GAMEMODE, portal.Entity)
 			if IsValid(filter) then
 				data.IgnoreEntity = filter
 			end
@@ -28,7 +28,7 @@ function WorldPortals_TraceLine(data)
 	local trace = util.RealTraceLine(data)
 	local portal = wp.GetFirstPortalHit(trace.StartPos, trace.Normal)
 
-	if(IsValid(portal.Entity)) then
+	if IsValid(portal.Entity) then
 		local hitPos = portal.HitPos
 
 		local localHitPos = portal.Entity:WorldToLocal(portal.HitPos)

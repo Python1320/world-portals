@@ -64,11 +64,10 @@ function wp.GetFirstPortalHit(source, direction)
 		if not IsValid(v:GetExit()) then continue end
 		local hitPos = util.IntersectRayWithPlane(source, direction, v:GetPos(), v:GetForward())
 
-		if isvector(hitPos) 
-		and direction:Dot( v:GetForward() ) < 0 then
+		if isvector(hitPos) and direction:Dot( v:GetForward() ) < 0 then
 			local dist = source:Distance(v:GetPos())
 
-			if(portal.Distance == 0) then
+			if portal.Distance == 0 then
 				portal.Distance = dist
 			end
 
