@@ -44,5 +44,6 @@ function ENT:SetupDataTables()
 	self:NetworkVar( "Int", 1, "Width" )
 	self:NetworkVar( "Int", 2, "Height" )
 	self:NetworkVar( "Int", 3, "DisappearDist" )
+	self:NetworkVar( "String", 0, "CustomLink" )
 
 end
