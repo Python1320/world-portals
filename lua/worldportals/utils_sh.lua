@@ -52,3 +52,32 @@ function wp.TransformPortalAngle( angle, portal, exit_portal )
 	return w_angle
 
 end
+
+--Returns the first portal hit starting from a source position and given the direction of the vector
+function wp.GetFirstPortalHit(source, direction)
+	local portal = {
+		Entity = nil,
+		Distance = 0,
+		HitPos = Vector(0,0,0)
+	}
+	for k,v in pairs(ents.FindByClass("linked_portal_door")) do
+		if not IsValid(v:GetExit()) then continue end
+		local hitPos = util.IntersectRayWithPlane(source, direction, v:GetPos(), v:GetForward())
+
+		if isvector(hitPos) and direction:Dot( v:GetForward() ) < 0 then
+			local dist = source:Distance(v:GetPos())
+
+			if portal.Distance == 0 then
+				portal.Distance = dist
+			end
+
+			if dist <= portal.Distance then
+				portal.Entity = v
+				portal.Distance = dist
+				portal.HitPos = hitPos
+			end
+		end
+	end
+
+	return portal
+end

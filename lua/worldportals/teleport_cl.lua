@@ -72,12 +72,11 @@ end )
 
 hook.Add("CalcView", "WorldPortals_RotateView", function(ply,pos,ang,fov)
 	if wp.rotating then
-		local offset=0.5 -- End transition smoothness (lower is smoother)
-		if math.abs(wp.rotating) > offset then
-			wp.rotating = math.Approach(wp.rotating,0,FrameTime()*math.abs(wp.rotating-offset)*3.5)
+		if wp.rotating ~= 0 then
+			wp.rotating = math.Approach(wp.rotating,0,FrameTime()*((0.5+math.abs(wp.rotating))*3.5))
 			local view={
 				origin=pos,
-				angles=Angle(ang.p,ang.y,wp.rotating+offset),
+				angles=Angle(ang.p,ang.y,wp.rotating),
 				fov=fov
 			}
 			return view
