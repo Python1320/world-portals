@@ -77,7 +77,7 @@ hook.Add("CalcView", "WorldPortals_RotateView", function(ply,pos,ang,fov)
 			wp.rotating = math.Approach(wp.rotating,0,FrameTime()*math.abs(wp.rotating-offset)*3.5)
 			local view={
 				origin=pos,
-				angles=Angle(ang.p,ang.y,wp.rotating+offset),
+				angles=Angle(ang.p,ang.y,wp.rotating - offset),
 				fov=fov
 			}
 			return view
