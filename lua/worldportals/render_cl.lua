@@ -22,7 +22,7 @@ hook.Add( "PostRender", "WorldPortals_StartRender", function()
 end )
 
 function wp.shouldrender( portal )
-	local camOrigin = GetViewEntity():GetPos()
+	local camOrigin = GetViewEntity():EyePos()
 	local exitPortal = portal:GetExit()
 	local distance = camOrigin:Distance( portal:GetPos() )
 	local disappearDist = portal:GetDisappearDist()
