@@ -57,49 +57,46 @@ hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
 	LocalPlayer():SetWeaponColor( Vector( 0, 0, 0 ) )
 	
 	for _, portal in pairs( wp.portals ) do
-
 		local exitPortal = portal:GetExit()
-		if not IsValid(exitPortal) then continue end
+		if IsValid(exitPortal) and wp.shouldrender(portal) and portal:GetShouldDrawNextFrame() then
+			portal:SetShouldDrawNextFrame( false )
+			
+			hook.Call( "wp-prerender", GAMEMODE, portal, exitPortal, plyOrigin )
+			
+			render.PushRenderTarget( portal:GetTexture() )
+				render.Clear( 0, 0, 0, 255, true, true )
 
-		if not wp.shouldrender( portal ) then continue end
-		if not portal:GetShouldDrawNextFrame() then continue end
-		portal:SetShouldDrawNextFrame( false )
-		
-		hook.Call( "wp-prerender", GAMEMODE, portal, exitPortal, plyOrigin )
-		
-		render.PushRenderTarget( portal:GetTexture() )
-			render.Clear( 0, 0, 0, 255, true, true )
+				local oldClip = render.EnableClipping( true )
+				render.PushCustomClipPlane( exitPortal:GetForward(), exitPortal:GetForward():Dot( exitPortal:GetPos() - exitPortal:GetForward() * 0.5 ) )
 
-			local oldClip = render.EnableClipping( true )
-			render.PushCustomClipPlane( exitPortal:GetForward(), exitPortal:GetForward():Dot( exitPortal:GetPos() - exitPortal:GetForward() * 0.5 ) )
+				local camOrigin = wp.TransformPortalPos( plyOrigin, portal, exitPortal )
+				local camAngle = wp.TransformPortalAngle( plyAngle, portal, exitPortal )
 
-			local camOrigin = wp.TransformPortalPos( plyOrigin, portal, exitPortal )
-			local camAngle = wp.TransformPortalAngle( plyAngle, portal, exitPortal )
+				wp.drawing = true
+				wp.drawingent = portal
+					render.RenderView( {
+						x = 0,
+						y = 0,
+						w = ScrW(),
+						h = ScrH(),
+						origin = camOrigin,
+						angles = camAngle,
+						dopostprocess = false,
+						drawhud = false,
+						drawmonitors = false,
+						drawviewmodel = false,
+						bloomtone = true
+						--zfar = 1500
+					} )
+				wp.drawing = false
+				wp.drawingent = nil
 
-			wp.drawing = true
-			wp.drawingent = portal
-				render.RenderView( {
-					x = 0,
-					y = 0,
-					w = ScrW(),
-					h = ScrH(),
-					origin = camOrigin,
-					angles = camAngle,
-					dopostprocess = false,
-					drawhud = false,
-					drawmonitors = false,
-					drawviewmodel = false,
-					bloomtone = true
-					--zfar = 1500
-				} )
-			wp.drawing = false
-			wp.drawingent = nil
-
-			render.PopCustomClipPlane()
-			render.EnableClipping( oldClip )
-		render.PopRenderTarget()
-		
-		hook.Call( "wp-postrender", GAMEMODE, portal, exitPortal, plyOrigin )
+				render.PopCustomClipPlane()
+				render.EnableClipping( oldClip )
+			render.PopRenderTarget()
+			
+			hook.Call( "wp-postrender", GAMEMODE, portal, exitPortal, plyOrigin )
+		end
 	end
 
 	LocalPlayer():SetWeaponColor( oldWepColor )

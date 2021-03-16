@@ -61,20 +61,21 @@ function wp.GetFirstPortalHit(source, direction)
 		HitPos = Vector(0,0,0)
 	}
 	for k,v in pairs(ents.FindByClass("linked_portal_door")) do
-		if not IsValid(v:GetExit()) then continue end
-		local hitPos = util.IntersectRayWithPlane(source, direction, v:GetPos(), v:GetForward())
+		if v.GetExit and IsValid(v:GetExit()) then
+			local hitPos = util.IntersectRayWithPlane(source, direction, v:GetPos(), v:GetForward())
 
-		if isvector(hitPos) and direction:Dot( v:GetForward() ) < 0 then
-			local dist = source:Distance(v:GetPos())
+			if isvector(hitPos) and direction:Dot( v:GetForward() ) < 0 then
+				local dist = source:Distance(v:GetPos())
 
-			if portal.Distance == 0 then
-				portal.Distance = dist
-			end
+				if portal.Distance == 0 then
+					portal.Distance = dist
+				end
 
-			if dist <= portal.Distance then
-				portal.Entity = v
-				portal.Distance = dist
-				portal.HitPos = hitPos
+				if dist <= portal.Distance then
+					portal.Entity = v
+					portal.Distance = dist
+					portal.HitPos = hitPos
+				end
 			end
 		end
 	end
