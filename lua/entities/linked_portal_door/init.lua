@@ -68,10 +68,9 @@ function ENT:Touch( ent )
 			local new_angle = wp.TransformPortalAngle( ent:GetAngles(), self, exit )
 			if ent:IsPlayer() then
 				local height = ent:OBBMaxs().z
-				local eyePos = ent:WorldToLocal(ent:EyePos())
-				local temppos = Vector(eyePos)
+				local temppos = Vector(0,0,height)
 				temppos:Rotate(new_angle)
-				new_pos = new_pos + Vector(0,0,((temppos.z - height) / 2)) 
+				new_pos = new_pos + Vector(0,0,(temppos.z - height) / 2) 
 			end
 		
 			
