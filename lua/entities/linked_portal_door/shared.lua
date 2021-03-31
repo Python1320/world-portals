@@ -1,6 +1,6 @@
 
 ENT.Type				= "anim"
-ENT.RenderGroup			= RENDERGROUP_BOTH // fixes translucent stuff rendering behind the portal
+ENT.RenderGroup			= RENDERGROUP_BOTH -- fixes translucent stuff rendering behind the portal
 ENT.Spawnable			= false
 ENT.AdminOnly			= false
 ENT.Editable			= false

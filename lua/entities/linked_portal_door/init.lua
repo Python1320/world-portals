@@ -47,7 +47,7 @@ function ENT:Touch( ent )
 	if not IsValid(exit) then return end
 	
 	if IsValid( self:GetParent() ) then
-		local ents = constraint.GetAllConstrainedEntities( self:GetParent() ) // don't mess up this contraption we're on
+		local ents = constraint.GetAllConstrainedEntities( self:GetParent() ) -- don't mess up this contraption we're on
 		for k,v in pairs( ents ) do
 			if v == ent then
 				return
@@ -66,6 +66,14 @@ function ENT:Touch( ent )
 			local new_pos = wp.TransformPortalPos( ent:GetPos() + ent:GetVelocity() * engine.TickInterval(), self, exit )
 			local new_velocity = wp.TransformPortalVector( ent:GetVelocity(), self, exit )
 			local new_angle = wp.TransformPortalAngle( ent:GetAngles(), self, exit )
+			if ent:IsPlayer() then
+				local height = ent:OBBMaxs().z
+				local eyePos = ent:WorldToLocal(ent:EyePos())
+				local temppos = Vector(eyePos)
+				temppos:Rotate(new_angle)
+				new_pos = new_pos + Vector(0,0,((temppos.z - height) / 2)) 
+			end
+		
 			
 			local store
 			if ent:IsRagdoll() then
