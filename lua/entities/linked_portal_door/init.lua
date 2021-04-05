@@ -69,7 +69,7 @@ function ENT:Touch( ent )
 			if ent:IsPlayer() then
 				local height = ent:OBBMaxs().z
 				local temppos = Vector(0,0,height)
-				temppos:Rotate(new_angle)
+				temppos:Rotate(Angle(0,0,new_angle.r))
 				new_pos = new_pos + Vector(0,0,(temppos.z - height) / 2) 
 			end
 		
