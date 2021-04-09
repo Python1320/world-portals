@@ -7,6 +7,8 @@ include( "shared.lua" )
 AccessorFunc( ENT, "partnername", "PartnerName" )
 AccessorFunc( ENT, "enableteleport", "EnableTeleport", FORCE_BOOL )
 
+util.AddNetworkString("WorldPortals_VRMod_SetAngle")
+
 -- Collect properties
 function ENT:KeyValue( key, value )
 
@@ -86,6 +88,11 @@ function ENT:Touch( ent )
 			end
 			ent:SetPos( new_pos )
 			if ent:IsPlayer() then
+				if vrmod and vrmod.IsPlayerInVR(ent) then
+					net.Start("WorldPortals_VRMod_SetAngle")
+						net.WriteDouble(wp.TransformPortalAngle(Angle(0,0,0), self, exit).y)
+					net.Send(ent)
+				end
 				ent:SetEyeAngles( Angle(new_angle.p, new_angle.y, 0) )
 				ent:SetLocalVelocity( new_velocity )
 				wp.AlertPlayerOnTeleport( ent, new_angle.r )

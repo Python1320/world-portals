@@ -57,3 +57,12 @@ function ENT:Draw()
 
 	hook.Call("wp-postdraw", GAMEMODE, self, exitPortal)
 end
+
+net.Receive("WorldPortals_VRMod_SetAngle", function()
+	local yawOffset = net.ReadDouble()
+	if vrmod and vrmod.IsPlayerInVR() then
+		local ang = vrmod.GetOriginAng()
+		ang.y = ang.y + yawOffset
+		vrmod.SetOriginAng(ang)
+	end
+end)
