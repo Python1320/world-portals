@@ -1,15 +1,7 @@
 
 -- Setup variables
-wp.matView = CreateMaterial(
-	"UnlitGeneric",
-	"GMODScreenspace",
-	{
-		[ "$basetexturetransform" ] = "center .5 .5 scale -1 -1 rotate 0 translate 0 0",
-		[ "$texturealpha" ] = "0",
-		[ "$vertexalpha" ] = "1",
-	}
-)
 wp.matDummy = Material( "wp/black" )
+wp.matView = CreateMaterial("WorldPortals", "Core_DX90", {["$basetexture"] = wp.matDummy:GetName(), ["$model"] = "1"})
 
 wp.portals = {}
 wp.drawing = true --default portals to not draw
@@ -43,14 +35,26 @@ function wp.shouldrender( portal )
 end
 
 
+if not render.RealRenderView then
+	render.RealRenderView = render.RenderView
+end
 
--- Render views from the portals
-hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
+function WorldPortals_RenderView(view)
+	if not wp.drawing then
+		wp.renderportals(view.origin or EyePos(), view.angles or EyeAngles())
+	end
+	return render.RealRenderView(view)
+end
 
-	wp.portals = ents.FindByClass( "linked_portal_door" )
+render.RenderView = WorldPortals_RenderView
+hook.Add("InitPostEntity", "WorldPortals_RenderView", function()
+	render.RenderView = WorldPortals_RenderView
+end)
 
-	if ( not wp.portals ) then return end
+function wp.renderportals( plyOrigin, plyAngle )
 	if ( wp.drawing ) then return end
+	wp.portals = ents.FindByClass( "linked_portal_door" )
+	if ( not wp.portals ) then return end
 
 	-- Disable phys gun glow and beam
 	local oldWepColor = LocalPlayer():GetWeaponColor()
@@ -58,8 +62,7 @@ hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
 	
 	for _, portal in pairs( wp.portals ) do
 		local exitPortal = portal:GetExit()
-		if IsValid(exitPortal) and wp.shouldrender(portal) and portal:GetShouldDrawNextFrame() then
-			portal:SetShouldDrawNextFrame( false )
+		if IsValid(exitPortal) and wp.shouldrender(portal) then
 			
 			hook.Call( "wp-prerender", GAMEMODE, portal, exitPortal, plyOrigin )
 			
@@ -98,8 +101,11 @@ hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
 			hook.Call( "wp-postrender", GAMEMODE, portal, exitPortal, plyOrigin )
 		end
 	end
-
 	LocalPlayer():SetWeaponColor( oldWepColor )
+end
+
+hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
+	wp.renderportals(plyOrigin, plyAngle)
 end )
 
 --[[ causes player to see themselves in first person sometimes (particularly in multiplayer)
