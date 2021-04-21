@@ -1,5 +1,6 @@
 
 -- Setup variables
+wp.matDummy = Material( "wp/black" )
 wp.matView = CreateMaterial(
 	"UnlitGeneric",
 	"GMODScreenspace",
@@ -9,10 +10,11 @@ wp.matView = CreateMaterial(
 		[ "$vertexalpha" ] = "1",
 	}
 )
-wp.matDummy = Material( "wp/black" )
+wp.matView2 = CreateMaterial("WorldPortals", "Core_DX90", {["$basetexture"] = wp.matDummy:GetName(), ["$model"] = "1"})
 
 wp.portals = {}
 wp.drawing = true --default portals to not draw
+wp.rendermode = false
 
 -- Start drawing the portals
 -- This prevents the game from crashing when loaded for the first time
@@ -26,7 +28,7 @@ function wp.shouldrender( portal )
 	local exitPortal = portal:GetExit()
 	local distance = camOrigin:Distance( portal:GetPos() )
 	local disappearDist = portal:GetDisappearDist()
-	
+
 	if not IsValid( exitPortal ) then return false end
 	
 	local override, drawblack = hook.Call( "wp-shouldrender", GAMEMODE, portal, exitPortal )
@@ -43,14 +45,28 @@ function wp.shouldrender( portal )
 end
 
 
+if not render.RealRenderView then
+	render.RealRenderView = render.RenderView
+end
 
--- Render views from the portals
-hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
+function WorldPortals_RenderView(view)
+	if not wp.drawing then
+		wp.renderportals(view.origin or EyePos(), view.angles or EyeAngles(), view.width or ScrW(), view.height or ScrH())
+	end
+	wp.rendermode = true
+	local renderView = render.RealRenderView(view)
+	wp.rendermode = false
+end
 
-	wp.portals = ents.FindByClass( "linked_portal_door" )
+render.RenderView = WorldPortals_RenderView
+hook.Add("InitPostEntity", "WorldPortals_RenderView", function()
+	render.RenderView = WorldPortals_RenderView
+end)
 
-	if ( not wp.portals ) then return end
+function wp.renderportals( plyOrigin, plyAngle, width, height )
 	if ( wp.drawing ) then return end
+	wp.portals = ents.FindByClass( "linked_portal_door" )
+	if ( not wp.portals ) then return end
 
 	-- Disable phys gun glow and beam
 	local oldWepColor = LocalPlayer():GetWeaponColor()
@@ -58,12 +74,10 @@ hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
 	
 	for _, portal in pairs( wp.portals ) do
 		local exitPortal = portal:GetExit()
-		if IsValid(exitPortal) and wp.shouldrender(portal) and portal:GetShouldDrawNextFrame() then
-			portal:SetShouldDrawNextFrame( false )
-			
+		local texture = portal:GetTexture()
+		if IsValid(exitPortal) and wp.shouldrender(portal) and texture then
 			hook.Call( "wp-prerender", GAMEMODE, portal, exitPortal, plyOrigin )
-			
-			render.PushRenderTarget( portal:GetTexture() )
+			render.PushRenderTarget( texture )
 				render.Clear( 0, 0, 0, 255, true, true )
 
 				local oldClip = render.EnableClipping( true )
@@ -77,8 +91,8 @@ hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
 					render.RenderView( {
 						x = 0,
 						y = 0,
-						w = ScrW(),
-						h = ScrH(),
+						w = width,
+						h = height,
 						origin = camOrigin,
 						angles = camAngle,
 						dopostprocess = false,
@@ -98,8 +112,11 @@ hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
 			hook.Call( "wp-postrender", GAMEMODE, portal, exitPortal, plyOrigin )
 		end
 	end
-
 	LocalPlayer():SetWeaponColor( oldWepColor )
+end
+
+hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
+	wp.renderportals(plyOrigin, plyAngle, ScrW(), ScrH())
 end )
 
 --[[ causes player to see themselves in first person sometimes (particularly in multiplayer)
