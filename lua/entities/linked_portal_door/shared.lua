@@ -13,12 +13,6 @@ function ENT:Initialize()
 
 	if CLIENT then
 
-		self:SetTexture( GetRenderTarget("portal" .. self:EntIndex(),
-			ScrW(),
-			ScrH(),
-			false
-		) )
-
 		self:SetRenderBounds( mins, maxs )
 
 	else
