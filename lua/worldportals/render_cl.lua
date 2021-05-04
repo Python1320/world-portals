@@ -23,15 +23,17 @@ hook.Add( "PostRender", "WorldPortals_StartRender", function()
 	hook.Remove( "PostRender", "WorldPortals_StartRender" )
 end )
 
-function wp.shouldrender( portal )
-	local camOrigin = GetViewEntity():EyePos()
+function wp.shouldrender( portal, camOrigin, camAngle, camFOV )
+	if not camOrigin then camOrigin = GetViewEntity():EyePos() end
+	if not camAngle then camAngle = GetViewEntity():EyeAngles() end
+	if not camFOV then camFOV = LocalPlayer():GetFOV() end
 	local exitPortal = portal:GetExit()
 	local distance = camOrigin:Distance( portal:GetPos() )
 	local disappearDist = portal:GetDisappearDist()
 
 	if not IsValid( exitPortal ) then return false end
 	
-	local override, drawblack = hook.Call( "wp-shouldrender", GAMEMODE, portal, exitPortal )
+	local override, drawblack = hook.Call( "wp-shouldrender", GAMEMODE, portal, exitPortal, camOrigin )
 	if override ~= nil then return override, drawblack end
 	
 	
@@ -40,7 +42,9 @@ function wp.shouldrender( portal )
 	--don't render if the view is behind the portal
 	local behind = wp.IsBehind( camOrigin, portal:GetPos(), portal:GetForward() )
 	if behind then return false end
-	
+	local lookingAt = wp.IsLookingAt( portal, camOrigin, camAngle, camFOV )
+	if not lookingAt then return false end
+
 	return true
 end
 
@@ -51,7 +55,7 @@ end
 
 function WorldPortals_RenderView(view)
 	if not wp.drawing then
-		wp.renderportals(view.origin or EyePos(), view.angles or EyeAngles(), view.width or ScrW(), view.height or ScrH())
+		wp.renderportals(view.origin or EyePos(), view.angles or EyeAngles(), view.width or ScrW(), view.height or ScrH(), view.fov or LocalPlayer():GetFOV())
 	end
 	wp.rendermode = true
 	local renderView = render.RealRenderView(view)
@@ -63,7 +67,7 @@ hook.Add("InitPostEntity", "WorldPortals_RenderView", function()
 	render.RenderView = WorldPortals_RenderView
 end)
 
-function wp.renderportals( plyOrigin, plyAngle, width, height )
+function wp.renderportals( plyOrigin, plyAngle, width, height, fov )
 	if ( wp.drawing ) then return end
 	wp.portals = ents.FindByClass( "linked_portal_door" )
 	if ( not wp.portals ) then return end
@@ -71,11 +75,11 @@ function wp.renderportals( plyOrigin, plyAngle, width, height )
 	-- Disable phys gun glow and beam
 	local oldWepColor = LocalPlayer():GetWeaponColor()
 	LocalPlayer():SetWeaponColor( Vector( 0, 0, 0 ) )
-	
+
 	for _, portal in pairs( wp.portals ) do
 		local exitPortal = portal:GetExit()
 		local texture = portal:GetTexture()
-		if IsValid(exitPortal) and wp.shouldrender(portal) and texture then
+		if IsValid(exitPortal) and wp.shouldrender(portal, plyOrigin, plyAngle, fov) and texture then
 			hook.Call( "wp-prerender", GAMEMODE, portal, exitPortal, plyOrigin )
 			render.PushRenderTarget( texture )
 				render.Clear( 0, 0, 0, 255, true, true )
@@ -93,6 +97,7 @@ function wp.renderportals( plyOrigin, plyAngle, width, height )
 						y = 0,
 						w = width,
 						h = height,
+						fov = fov,
 						origin = camOrigin,
 						angles = camAngle,
 						dopostprocess = false,
@@ -115,8 +120,8 @@ function wp.renderportals( plyOrigin, plyAngle, width, height )
 	LocalPlayer():SetWeaponColor( oldWepColor )
 end
 
-hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle )
-	wp.renderportals(plyOrigin, plyAngle, ScrW(), ScrH())
+hook.Add( "RenderScene", "WorldPortals_Render", function( plyOrigin, plyAngle, fov )
+	wp.renderportals(plyOrigin, plyAngle, ScrW(), ScrH(), fov)
 end )
 
 --[[ causes player to see themselves in first person sometimes (particularly in multiplayer)
