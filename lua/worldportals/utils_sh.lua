@@ -11,6 +11,51 @@ function wp.IsBehind( object_pos, plane_pos, plane_forward )
 	return false
 end
 
+local function crossDist(vec1, vec2)
+	return math.sqrt(vec1:LengthSqr() * vec2:LengthSqr() - vec1:Dot(vec2)^2)
+end
+
+local function arctan2(y, x)
+	if ((x != 0) or (y != 0)) then
+		if (math.abs(x) >= math.abs(y)) then
+			if (x >= 0) then
+				return math.atan(y / x)
+			elseif (y >= 0) then
+				return math.atan(y / x) + math.pi
+			else
+				return math.atan(y / x) - math.pi
+			end
+		elseif (y >= 0) then
+			return math.pi / 2 - math.atan(x / y)
+		else
+			return -math.pi / 2 - math.atan(x / y)
+		end
+	else
+		return 0.0
+	end
+end
+
+-- Checks if a given position and view angle is looking at another position
+-- Adapted from SCP 173 https://steamcommunity.com/sharedfiles/filedetails/?id=830210642
+function wp.IsLookingAt( portal, view_pos, view_ang, view_fov )
+	local radius = portal:BoundingRadius()
+	local disp = portal:GetPos() - view_pos
+	
+	local distSqr = disp:LengthSqr()
+	if ((distSqr > (radius^2)) and (distSqr > 0)) then
+		local aimVec = view_ang:Forward()
+		local dir = disp:GetNormalized()
+		local viewRadius = arctan2(radius/math.sqrt(distSqr), math.sqrt(1 - radius^2/distSqr)) * 180 / math.pi
+		local viewOffset = arctan2(crossDist(dir, aimVec), dir:Dot(aimVec)) * 180 / math.pi
+		
+		if (viewOffset <= ((view_fov*1.5) / 2 + viewRadius)) then
+			return true
+		end
+	else
+		return true
+	end
+end
+
 -- Returns the distance to a plane
 function wp.DistanceToPlane( object_pos, plane_pos, plane_forward )
 
