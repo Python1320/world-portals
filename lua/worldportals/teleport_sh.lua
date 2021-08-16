@@ -1,7 +1,13 @@
 
 hook.Add("EntityFireBullets", "WorldPortals_Bullets", function(ent,data)
+	local trace = util.RealTraceLine({
+		start = data.Src,
+		endpos = data.Src + data.Dir * data.Distance,
+		filter = data.IgnoreEntity,
+	})
+
 	local portal = wp.GetFirstPortalHit(data.Src, data.Dir)
-	if IsValid(portal.Entity) then
+	if IsValid(portal.Entity) and portal.Distance < trace.HitPos:Distance(ent:GetPos()) then
 		local localHitPos = portal.Entity:WorldToLocal(portal.HitPos)
 		local mins, maxs = portal.Entity:GetCollisionBounds()
 		if localHitPos.y > mins.y and localHitPos.y < maxs.y
