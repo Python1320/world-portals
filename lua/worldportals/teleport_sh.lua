@@ -34,7 +34,7 @@ function WorldPortals_TraceLine(data)
 	local trace = util.RealTraceLine(data)
 	local portal = wp.GetFirstPortalHit(trace.StartPos, trace.Normal)
 
-	if IsValid(portal.Entity) then
+	if IsValid(portal.Entity) and portal.Distance < trace.HitPos:Distance(ent:GetPos()) then
 		local hitPos = portal.HitPos
 
 		local localHitPos = portal.Entity:WorldToLocal(portal.HitPos)
