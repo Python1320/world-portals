@@ -24,8 +24,8 @@ hook.Add( "PostRender", "WorldPortals_StartRender", function()
 end )
 
 function wp.shouldrender( portal, camOrigin, camAngle, camFOV )
-	if not camOrigin then camOrigin = GetViewEntity():EyePos() end
-	if not camAngle then camAngle = GetViewEntity():EyeAngles() end
+	if not camOrigin then camOrigin = EyePos() end
+	if not camAngle then camAngle = EyeAngles() end
 	if not camFOV then camFOV = LocalPlayer():GetFOV() end
 	local exitPortal = portal:GetExit()
 	local distance = camOrigin:Distance( portal:GetPos() )
