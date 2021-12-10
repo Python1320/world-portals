@@ -61,11 +61,11 @@ function ENT:Touch( ent )
 	-- Object is moving towards the portal
 	if vel_norm:Dot( self:GetForward() ) < 0 then
 
-		local projected_distance = wp.DistanceToPlane( ent:EyePos() + ent:GetVelocity() * engine.TickInterval(), self:GetPos(), self:GetForward() )
+		local projected_distance = wp.DistanceToPlane( ent:EyePos(), self:GetPos(), self:GetForward() )
 
 		if projected_distance < 0 and hook.Call("wp-shouldtp",GAMEMODE,self,ent)~=false then
 
-			local new_pos = wp.TransformPortalPos( ent:GetPos() + ent:GetVelocity() * engine.TickInterval(), self, exit )
+			local new_pos = wp.TransformPortalPos( ent:GetPos(), self, exit )
 			local new_velocity = wp.TransformPortalVector( ent:GetVelocity(), self, exit )
 			local new_angle = wp.TransformPortalAngle( ent:GetAngles(), self, exit )
 			if ent:IsPlayer() then
