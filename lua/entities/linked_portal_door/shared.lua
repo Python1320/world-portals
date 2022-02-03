@@ -1,43 +1,43 @@
 
-ENT.Type				= "anim"
-ENT.RenderGroup			= RENDERGROUP_BOTH -- fixes translucent stuff rendering behind the portal
-ENT.Spawnable			= false
-ENT.AdminOnly			= false
-ENT.Editable			= false
+ENT.Type                = "anim"
+ENT.RenderGroup         = RENDERGROUP_BOTH -- fixes translucent stuff rendering behind the portal
+ENT.Spawnable           = false
+ENT.AdminOnly           = false
+ENT.Editable            = false
 
 
 function ENT:Initialize()
 
-	local mins = Vector( 0, -self:GetWidth() /2, -self:GetHeight() /2 )
-	local maxs = Vector( 10, self:GetWidth() /2, self:GetHeight() /2)
+    local mins = Vector( 0, -self:GetWidth() /2, -self:GetHeight() /2 )
+    local maxs = Vector( 10, self:GetWidth() /2, self:GetHeight() /2)
 
-	if CLIENT then
+    if CLIENT then
 
-		self:SetRenderBounds( mins, maxs )
+        self:SetRenderBounds( mins, maxs )
 
-	else
+    else
 
-		self:SetTrigger( true )
+        self:SetTrigger( true )
 
-	end
+    end
 
-	self:SetMoveType( MOVETYPE_NONE )
-	self:SetSolid( SOLID_OBB )
-	self:SetNotSolid( true )
-	self:SetCollisionBounds( mins, maxs )
-	self:SetCollisionGroup( COLLISION_GROUP_WORLD )
+    self:SetMoveType( MOVETYPE_NONE )
+    self:SetSolid( SOLID_OBB )
+    self:SetNotSolid( true )
+    self:SetCollisionBounds( mins, maxs )
+    self:SetCollisionGroup( COLLISION_GROUP_WORLD )
 
-	self:DrawShadow( false )
+    self:DrawShadow( false )
 
 end
 
 
 function ENT:SetupDataTables()
 
-	self:NetworkVar( "Entity", 0, "Exit" )
-	self:NetworkVar( "Int", 1, "Width" )
-	self:NetworkVar( "Int", 2, "Height" )
-	self:NetworkVar( "Int", 3, "DisappearDist" )
-	self:NetworkVar( "String", 0, "CustomLink" )
+    self:NetworkVar( "Entity", 0, "Exit" )
+    self:NetworkVar( "Int", 1, "Width" )
+    self:NetworkVar( "Int", 2, "Height" )
+    self:NetworkVar( "Int", 3, "DisappearDist" )
+    self:NetworkVar( "String", 0, "CustomLink" )
 
 end
