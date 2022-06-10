@@ -86,7 +86,15 @@ function wp.renderportals( plyOrigin, plyAngle, width, height, fov )
                 render.Clear( 0, 0, 0, 255, true, true )
 
                 local oldClip = render.EnableClipping( true )
-                render.PushCustomClipPlane( exitPortal:GetForward(), exitPortal:GetForward():Dot( exitPortal:GetPos() - exitPortal:GetForward() * 0.5 ) )
+
+                local exit_forward = exitPortal:GetForward()
+                local exit_ang_offset = exitPortal:GetExitAngOffset()
+                if exit_ang_offset then
+                    exit_forward:Rotate(exit_ang_offset)
+                end
+                local exit_pos =  exitPortal:GetPos() + exitPortal:GetExitPosOffset()
+
+                render.PushCustomClipPlane( exit_forward, exit_forward:Dot( exit_pos - exit_forward * 0.5 ) )
 
                 local camOrigin = wp.TransformPortalPos( plyOrigin, portal, exitPortal )
                 local camAngle = wp.TransformPortalAngle( plyAngle, portal, exitPortal )
