@@ -72,7 +72,7 @@ function wp.TransformPortalPos( vec, portal, exit_portal )
     --l_vec:Rotate( Angle(0, 180, 0) )
     --local w_vec = exit_portal:LocalToWorld( l_vec )
 
-    local w_vec = LocalToWorld(l_vec, Angle(), exit_portal:GetPos() + exit_portal:GetExitPosOffset(), Angle())
+    local w_vec = LocalToWorld(l_vec, portal:GetAngles(), exit_portal:GetPos() + exit_portal:GetExitPosOffset(), exit_portal:GetAngles() + Angle(0,180,0) + exit_portal:GetExitAngOffset())
 
     return w_vec
 
@@ -82,7 +82,7 @@ end
 function wp.TransformPortalVector( vec, portal, exit_portal )
 
     local rotate_ang = exit_portal:GetAngles() - portal:GetAngles() --+ exit_portal:GetExitAngOffset()
-    rotate_ang = rotate_ang + Angle( 0, 180, 0 ) --+ exit_portal:GetExitAngOffset()
+    rotate_ang = rotate_ang + Angle( 0, 180, 0 ) + exit_portal:GetExitAngOffset()
     vec:Rotate( rotate_ang )
 
     return vec
@@ -96,7 +96,7 @@ function wp.TransformPortalAngle( angle, portal, exit_portal )
     l_angle:RotateAroundAxis( Vector(0, 0, 1), 180)
     --local w_angle = exit_portal:LocalToWorldAngles(l_angle)-- + exit_portal:GetExitAngOffset()
 
-    local _, w_angle = LocalToWorld(Vector(0,0,0), l_angle, Vector(), exit_portal:GetAngles())-- + exit_portal:GetExitAngOffset())
+    local _, w_angle = LocalToWorld(Vector(0,0,0), l_angle, Vector(), exit_portal:GetAngles() + exit_portal:GetExitAngOffset())
 
     return w_angle
 
