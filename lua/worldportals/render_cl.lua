@@ -92,7 +92,14 @@ function wp.renderportals( plyOrigin, plyAngle, width, height, fov )
                 if exit_ang_offset then
                     exit_forward:Rotate(exit_ang_offset)
                 end
-                local exit_pos =  exitPortal:GetPos() + exitPortal:GetExitPosOffset()
+
+                local offset = exitPortal:GetExitPosOffset()
+
+                if exitPortal:GetParent() then
+                    offset:Rotate(exitPortal:GetParent():GetAngles())
+                end
+
+                local exit_pos = exitPortal:GetPos() + offset
 
                 render.PushCustomClipPlane( exit_forward, exit_forward:Dot( exit_pos - exit_forward * 0.5 ) )
 

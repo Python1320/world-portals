@@ -72,7 +72,13 @@ function wp.TransformPortalPos( vec, portal, exit_portal )
     --l_vec:Rotate( Angle(0, 180, 0) )
     --local w_vec = exit_portal:LocalToWorld( l_vec )
 
-    local w_vec = LocalToWorld(l_vec, portal:GetAngles(), exit_portal:GetPos() + exit_portal:GetExitPosOffset(), exit_portal:GetAngles() + Angle(0,180,0) + exit_portal:GetExitAngOffset())
+    local offset =  exit_portal:GetExitPosOffset()
+
+    if exit_portal:GetParent() then
+        offset:Rotate(exit_portal:GetParent():GetAngles())
+    end
+
+    local w_vec = LocalToWorld(l_vec, portal:GetAngles(), exit_portal:GetPos() + offset, exit_portal:GetAngles() + Angle(0,180,0) + exit_portal:GetExitAngOffset())
 
     return w_vec
 
