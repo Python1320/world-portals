@@ -97,8 +97,6 @@ function wp.TransformPortalAngle( angle, portal, exit_portal )
 
     local l_angle = portal:WorldToLocalAngles( angle )
     l_angle:RotateAroundAxis( Vector(0, 0, 1), 180)
-    --local w_angle = exit_portal:LocalToWorldAngles(l_angle)
-
     local _, w_angle = LocalToWorld(Vector(), l_angle, Vector(), exit_portal:GetAngles() + exit_portal:GetExitAngOffset())
 
     return w_angle
