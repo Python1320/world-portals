@@ -40,4 +40,7 @@ function ENT:SetupDataTables()
     self:NetworkVar( "Int", 3, "DisappearDist" )
     self:NetworkVar( "String", 0, "CustomLink" )
 
+    self:NetworkVar( "Vector", 0, "ExitPosOffset" )
+    self:NetworkVar( "Angle", 0, "ExitAngOffset" )
+
 end
