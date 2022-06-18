@@ -67,14 +67,11 @@ end
 
 -- Transforms a position from one portal to another
 function wp.TransformPortalPos( vec, portal, exit_portal )
-
     local l_vec = portal:WorldToLocal( vec )
-    --l_vec:Rotate( Angle(0, 180, 0) )
-    --local w_vec = exit_portal:LocalToWorld( l_vec )
 
     local offset =  exit_portal:GetExitPosOffset()
 
-    if exit_portal:GetParent() then
+    if IsValid(exit_portal:GetParent()) then
         offset:Rotate(exit_portal:GetParent():GetAngles())
     end
 

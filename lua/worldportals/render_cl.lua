@@ -95,7 +95,7 @@ function wp.renderportals( plyOrigin, plyAngle, width, height, fov )
 
                 local offset = exitPortal:GetExitPosOffset()
 
-                if exitPortal:GetParent() then
+                if IsValid(exitPortal:GetParent()) then
                     offset:Rotate(exitPortal:GetParent():GetAngles())
                 end
 
