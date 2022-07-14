@@ -5,7 +5,6 @@ AccessorFunc( ENT, "texture", "Texture" )
 
 -- Draw world portals
 function ENT:Draw()
-
     if wp.drawing then return end
     local shouldrender,drawblack=wp.shouldrender(self)
     if not (shouldrender or drawblack) then return end
@@ -25,7 +24,7 @@ function ENT:Draw()
         else
             render.SetMaterial( wp.matDummy )
         end
-        render.DrawQuadEasy( self:GetPos() -( self:GetForward() * 5 ), self:GetForward(), self:GetWidth(), self:GetHeight(), Color(0,0,0), self:GetAngles().roll )
+        render.DrawQuadEasy( self:GetPos() -( self:GetForward() * 5 ), self:GetForward(), self:GetWidth(), self:GetHeight(), color_black, self:GetAngles().roll )
     else
         if shouldrender then
             render.ClearStencil()
@@ -43,7 +42,7 @@ function ENT:Draw()
 
         render.SetMaterial( wp.matDummy )
         render.SetColorModulation( 1, 1, 1 )
-        render.DrawQuadEasy( self:GetPos() -( self:GetForward() * 5 ), self:GetForward(), self:GetWidth(), self:GetHeight(), Color(0,0,0), self:GetAngles().roll )
+        render.DrawBox(self:GetPos(), self:GetAngles(), self.RenderMin, self.RenderMax, color_black)
 
         if shouldrender then
             render.SetStencilCompareFunction( STENCIL_EQUAL )

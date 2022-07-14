@@ -11,7 +11,6 @@ util.AddNetworkString("WorldPortals_VRMod_SetAngle")
 
 -- Collect properties
 function ENT:KeyValue( key, value )
-
     if ( key == "partnername" ) then
         self:SetPartnerName( value )
         self:SetExit( ents.FindByName( value )[1] )
@@ -21,6 +20,9 @@ function ENT:KeyValue( key, value )
 
     elseif ( key == "height" ) then
         self:SetHeight( tonumber(value) *2 )
+
+    elseif ( key == "thickness" ) then
+        self:SetThickness( tonumber(value) )
 
     elseif ( key == "DisappearDist" or key == "fademaxdist" ) then
         self:SetDisappearDist( tonumber(value) )
