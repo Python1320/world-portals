@@ -3,6 +3,19 @@ include( "shared.lua" )
 
 AccessorFunc( ENT, "texture", "Texture" )
 
+function ENT:DrawPortal(exitPortal)
+    local allowthickportal = hook.Call("wp-allowthickportal", GAMEMODE, self, exitPortal)
+    if allowthickportal == false or self:GetThickness() == 0 then
+        render.DrawQuadEasy( self:GetPos() -( self:GetForward() * 5 ), self:GetForward(), self:GetWidth(), self:GetHeight(), Color(0,0,0), self:GetAngles().roll )
+    elseif self:GetInverted() then
+        for _,quad in ipairs(self.RenderQuads) do
+            render.DrawQuad(self:LocalToWorld(quad[1]), self:LocalToWorld(quad[2]), self:LocalToWorld(quad[3]), self:LocalToWorld(quad[4]), color_black)     
+        end
+    else
+        render.DrawBox(self:GetPos(), self:GetAngles(), self.RenderMin, self.RenderMax, color_black)
+    end
+end
+
 -- Draw world portals
 function ENT:Draw()
     if wp.drawing then return end
@@ -24,7 +37,7 @@ function ENT:Draw()
         else
             render.SetMaterial( wp.matDummy )
         end
-        render.DrawBox(self:GetPos(), self:GetAngles(), self.RenderMin, self.RenderMax, color_black)
+        self:DrawPortal(exitPortal)
     else
         if shouldrender then
             render.ClearStencil()
@@ -43,13 +56,7 @@ function ENT:Draw()
         render.SetMaterial( wp.matDummy )
         render.SetColorModulation( 1, 1, 1 )
 
-        if self:GetInverted() then
-            for _,quad in ipairs(self.RenderQuads) do
-                render.DrawQuad(self:LocalToWorld(quad[1]), self:LocalToWorld(quad[2]), self:LocalToWorld(quad[3]), self:LocalToWorld(quad[4]), color_black)     
-            end
-        else
-            render.DrawBox(self:GetPos(), self:GetAngles(), self.RenderMin, self.RenderMax, color_black)
-        end
+        self:DrawPortal(exitPortal)
 
         if shouldrender then
             render.SetStencilCompareFunction( STENCIL_EQUAL )
