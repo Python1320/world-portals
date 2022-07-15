@@ -42,7 +42,14 @@ function ENT:Draw()
 
         render.SetMaterial( wp.matDummy )
         render.SetColorModulation( 1, 1, 1 )
-        render.DrawBox(self:GetPos(), self:GetAngles(), self.RenderMin, self.RenderMax, color_black)
+
+        if self:GetInverted() then
+            for _,quad in ipairs(self.RenderQuads) do
+                render.DrawQuad(self:LocalToWorld(quad[1]), self:LocalToWorld(quad[2]), self:LocalToWorld(quad[3]), self:LocalToWorld(quad[4]), color_black)     
+            end
+        else
+            render.DrawBox(self:GetPos(), self:GetAngles(), self.RenderMin, self.RenderMax, color_black)
+        end
 
         if shouldrender then
             render.SetStencilCompareFunction( STENCIL_EQUAL )

@@ -12,6 +12,22 @@ function ENT:SetupBounds(w, h, t)
 
     self.RenderMin = Vector(-(5 + thickness), -width / 2, -height / 2)
     self.RenderMax = Vector(- 5             ,  width / 2,  height / 2)
+    self.RenderQuads = {
+        -- bottom
+        { Vector(self.RenderMin.x, self.RenderMin.y, self.RenderMin.z), Vector(self.RenderMax.x, self.RenderMin.y, self.RenderMin.z), Vector(self.RenderMax.x, self.RenderMax.y, self.RenderMin.z), Vector(self.RenderMin.x, self.RenderMax.y, self.RenderMin.z) },
+
+        -- top
+        { Vector(self.RenderMin.x, self.RenderMin.y, self.RenderMax.z), Vector(self.RenderMax.x, self.RenderMin.y, self.RenderMax.z), Vector(self.RenderMax.x, self.RenderMax.y, self.RenderMax.z), Vector(self.RenderMin.x, self.RenderMax.y, self.RenderMax.z) },
+
+        -- back
+        { Vector(self.RenderMin.x, self.RenderMin.y, self.RenderMin.z), Vector(self.RenderMin.x, self.RenderMin.y, self.RenderMax.z), Vector(self.RenderMin.x, self.RenderMax.y, self.RenderMax.z), Vector(self.RenderMin.x, self.RenderMax.y, self.RenderMin.z) },
+
+        -- left
+        { Vector(self.RenderMin.x, self.RenderMin.y, self.RenderMin.z), Vector(self.RenderMin.x, self.RenderMin.y, self.RenderMax.z), Vector(self.RenderMax.x, self.RenderMin.y, self.RenderMax.z), Vector(self.RenderMax.x, self.RenderMin.y, self.RenderMin.z) },
+        
+        -- right
+        { Vector(self.RenderMin.x, self.RenderMax.y, self.RenderMin.z), Vector(self.RenderMin.x, self.RenderMax.y, self.RenderMax.z), Vector(self.RenderMax.x, self.RenderMax.y, self.RenderMax.z), Vector(self.RenderMax.x, self.RenderMax.y, self.RenderMin.z) },
+    }
 
     self:SetCollisionBounds( self.RenderMin, self.RenderMax )
 
@@ -42,6 +58,7 @@ function ENT:SetupDataTables()
     self:NetworkVar( "Int", 3, "DisappearDist" )
     self:NetworkVar( "Int", 4, "Thickness" )
     self:NetworkVar( "String", 0, "CustomLink" )
+    self:NetworkVar( "Bool", 0, "Inverted" )
 
     self:NetworkVar( "Vector", 0, "ExitPosOffset" )
     self:NetworkVar( "Angle", 0, "ExitAngOffset" )
