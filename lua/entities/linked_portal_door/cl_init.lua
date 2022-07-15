@@ -4,8 +4,7 @@ include( "shared.lua" )
 AccessorFunc( ENT, "texture", "Texture" )
 
 function ENT:DrawPortal(exitPortal)
-    local allowthickportal = hook.Call("wp-allowthickportal", GAMEMODE, self, exitPortal)
-    if allowthickportal == false or self:GetThickness() == 0 then
+    if self:GetThickness() == 0 or hook.Call("wp-allowthickportal", GAMEMODE, self, exitPortal)==false then
         render.DrawQuadEasy( self:GetPos() -( self:GetForward() * 5 ), self:GetForward(), self:GetWidth(), self:GetHeight(), Color(0,0,0), self:GetAngles().roll )
     elseif self:GetInverted() then
         for _,quad in ipairs(self.RenderQuads) do
