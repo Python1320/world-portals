@@ -24,7 +24,7 @@ function ENT:Draw()
         else
             render.SetMaterial( wp.matDummy )
         end
-        render.DrawQuadEasy( self:GetPos() -( self:GetForward() * 5 ), self:GetForward(), self:GetWidth(), self:GetHeight(), color_black, self:GetAngles().roll )
+        render.DrawBox(self:GetPos(), self:GetAngles(), self.RenderMin, self.RenderMax, color_black)
     else
         if shouldrender then
             render.ClearStencil()
