@@ -37,9 +37,9 @@ end
 
 -- Checks if a given position and view angle is looking at another position
 -- Adapted from SCP 173 https://steamcommunity.com/sharedfiles/filedetails/?id=830210642
-function wp.IsLookingAt( portal, view_pos, view_ang, view_fov )
-    local radius = portal:BoundingRadius()
-    local disp = portal:GetPos() - view_pos
+function wp.IsLookingAt( portal, portal_pos, view_pos, view_ang, view_fov )
+    local radius = math.max(portal:BoundingRadius(), portal:GetThickness())
+    local disp = portal_pos - view_pos
     
     local distSqr = disp:LengthSqr()
     if ((distSqr > (radius^2)) and (distSqr > 0)) then

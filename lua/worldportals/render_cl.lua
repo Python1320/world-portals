@@ -41,9 +41,16 @@ function wp.shouldrender( portal, camOrigin, camAngle, camFOV )
     if not (disappearDist <= 0) and distance > disappearDist then return false end
     
     --don't render if the view is behind the portal
-    local behind = wp.IsBehind( camOrigin, portal:GetPos(), portal:GetForward() )
+    local portalPos
+    local thickness = portal:GetThickness()
+    if thickness > 0 then
+        portalPos = portal:LocalToWorld(Vector(-thickness,0,0))
+    else
+        portalPos = portal:GetPos()
+    end
+    local behind = wp.IsBehind( camOrigin, portalPos, portal:GetForward() )
     if behind then return false end
-    local lookingAt = wp.IsLookingAt( portal, camOrigin, camAngle, camFOV )
+    local lookingAt = wp.IsLookingAt( portal, portalPos, camOrigin, camAngle, camFOV )
     if not lookingAt then return false end
 
     return true
