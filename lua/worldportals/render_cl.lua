@@ -61,8 +61,10 @@ if not render.RealRenderView then
     render.RealRenderView = render.RenderView
 end
 
+local EMPTY={}
 function WorldPortals_RenderView(view)
     if not wp.drawing then
+        local view=view or EMPTY
         wp.renderportals(view.origin or EyePos(), view.angles or EyeAngles(), view.width or ScrW(), view.height or ScrH(), view.fov or LocalPlayer():GetFOV())
     end
     wp.rendermode = true
